@@ -8,7 +8,7 @@ ENV SWOOLE_VERSION=4.4.12
 ENV PECL_EXTENSIONS="ast igbinary imagick lzf mongodb msgpack psr redis ssh2-1.2 uuid xdebug yaml"
 ENV PECL_BUNDLE="memcached event"
 ENV PHP_EXTENSIONS="bcmath bz2 calendar exif gd gettext gmp imap intl ldap mysqli pcntl pdo_mysql pgsql pdo_pgsql \
-  soap sockets swoole swoole_async sysvshm sysvmsg sysvsem tidy zip"
+  soap sockets swoole swoole_async sysvshm sysvmsg sysvsem tidy zip pdo_odbc pdo_sqlsrv sqlsrv amqp inotify"
 
 # deps
 RUN \
@@ -32,10 +32,14 @@ RUN \
     # swoole
     && curl -sSLo swoole.tar.gz https://github.com/swoole/swoole-src/archive/v$SWOOLE_VERSION.tar.gz \
       && curl -sSLo swoole_async.tar.gz https://github.com/swoole/ext-async/archive/v$SWOOLE_VERSION.tar.gz \
-      && tar xzf swoole.tar.gz && tar xzf swoole_async.tar.gz \
-      && mv swoole-src-$SWOOLE_VERSION swoole && mv ext-async-$SWOOLE_VERSION swoole_async \
-      && rm -f swoole.tar.gz swoole_async.tar.gz \
-    && docker-php-ext-install -j "$(nproc)" $PHP_EXTENSIONS $PECL_BUNDLE \
+      && curl -sSLo pdo_sqlsrv.tar.gz https://pecl.php.net/get/pdo_sqlsrv-5.6.1.tgz  \
+      && curl -sSLo sqlsrv.tar.gz https://pecl.php.net/get/sqlsrv-5.6.1.tgz  \
+      && curl -sSLo amqp.tar.gz  https://pecl.php.net/get/amqp-1.9.4.tgz \
+      && curl -sSLo inotify.tar.gz https://pecl.php.net/get/inotify-2.0.0.tgz \
+      && tar xzf swoole.tar.gz && tar xzf swoole_async.tar.gz && tar zxf pdo_sqlsrv.tar.gz && tar zxf sqlsrv.tar.gz && tar zxf amqp.tar.gz && tar zxf inotify.tar.gz  \
+      && mv swoole-src-$SWOOLE_VERSION swoole && mv ext-async-$SWOOLE_VERSION swoole_async && mv pdo_sqlsrv-5.6.1 pdo_sqlsrv && mv sqlsrv-5.6.1 sqlsrv && mv amqp-1.9.4 amqp && mv inotify-2.0.0 inotify \
+      && rm -f swoole.tar.gz swoole_async.tar.gz pdo_sqlsrv.tar.gz sqlsrv.tar.gz amqp.tar.gz inotify.tar.gz \      
+      && docker-php-ext-install -j "$(nproc)" $PHP_EXTENSIONS $PECL_BUNDLE \
     && cd /usr/local/etc/php/conf.d/ \
       && mv docker-php-ext-event.ini docker-php-ext-zevent.ini \
     && pecl clear-cache
