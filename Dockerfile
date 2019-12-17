@@ -31,13 +31,13 @@ RUN \
 ENV PHP_EXTENSIONS="bcmath bz2 calendar exif gd gettext gmp imap intl ldap mysqli pcntl pdo_mysql pgsql pdo_pgsql \
   soap sockets swoole swoole_async sysvshm sysvmsg sysvsem tidy zip pdo_sqlsrv sqlsrv amqp inotify pdo_odbc"
   
-RUN apt-get update -yqq  \
-  && apt-get install -y apt-transport-https gnupg \
-  && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+RUN apk update \
+  && apk add  apt-transport-https gnupg \
+  && curl https://packages.microsoft.com/keys/microsoft.asc | apk add - \
   && curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-  && apt-get update -yqq \
+  && apk update\
   # Install Dependencies
-  && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev libgss3 odbcinst msodbcsql locales \
+  && ACCEPT_EULA=Y apk add unixodbc unixodbc-dev libgss3 odbcinst msodbcsql locales \
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && locale-gen   
   
