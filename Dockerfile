@@ -7,8 +7,6 @@ ENV PHALCON_VERSION=4.0.0-rc.3
 ENV SWOOLE_VERSION=4.4.12
 ENV PECL_EXTENSIONS="ast igbinary imagick lzf mongodb msgpack psr redis ssh2-1.2 uuid xdebug yaml"
 ENV PECL_BUNDLE="memcached event"
-ENV PHP_EXTENSIONS="bcmath bz2 calendar exif gd gettext gmp imap intl ldap mysqli pcntl pdo_mysql pgsql pdo_pgsql \
-  soap sockets swoole swoole_async sysvshm sysvmsg sysvsem tidy zip pdo_odbc pdo_sqlsrv sqlsrv amqp inotify"
 
 # deps
 RUN \
@@ -28,9 +26,13 @@ RUN \
     && pecl install $PECL_EXTENSIONS \
     && cd /usr/src/php/ext/ \
     && for BUNDLE_EXT in $PECL_BUNDLE; do pecl bundle $BUNDLE_EXT; done \
-    && docker-php-ext-enable $(echo $PECL_EXTENSIONS | sed -E 's/\-[^ ]+//g') opcache \
-    # swoole
-    && curl -sSLo swoole.tar.gz https://github.com/swoole/swoole-src/archive/v$SWOOLE_VERSION.tar.gz \
+    && docker-php-ext-enable $(echo $PECL_EXTENSIONS | sed -E 's/\-[^ ]+//g') opcache 
+    
+ENV PHP_EXTENSIONS="bcmath bz2 calendar exif gd gettext gmp imap intl ldap mysqli pcntl pdo_mysql pgsql pdo_pgsql \
+  soap sockets swoole swoole_async sysvshm sysvmsg sysvsem tidy zip pdo_sqlsrv sqlsrv amqp inotify pdo_odbc"
+  
+RUN \    
+   curl -sSLo swoole.tar.gz https://github.com/swoole/swoole-src/archive/v$SWOOLE_VERSION.tar.gz \
       && curl -sSLo swoole_async.tar.gz https://github.com/swoole/ext-async/archive/v$SWOOLE_VERSION.tar.gz \
       && curl -sSLo pdo_sqlsrv.tar.gz https://pecl.php.net/get/pdo_sqlsrv-5.6.1.tgz  \
       && curl -sSLo sqlsrv.tar.gz https://pecl.php.net/get/sqlsrv-5.6.1.tgz  \
